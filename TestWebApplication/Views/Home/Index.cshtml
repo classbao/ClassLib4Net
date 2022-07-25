@@ -49,7 +49,7 @@
 
     <fieldset>
         <legend>自定义二维码 · 样例</legend>
-        <img src="~/Handler/QRCode.ashx?data=你想什么，我们就做什么" />
+        <img src="~/Handler/QRCode.ashx?data=你想什么，我们就做什么"  onclick="javascript: this.src = (this.src + '?t=' + (new Date()).getTime());" style="height: 36px;width: 120px;padding: 0 0;margin: 0 0;cursor: pointer;" title="点击刷新验证码" alt="验证码" />
     </fieldset>
     
     <div> 

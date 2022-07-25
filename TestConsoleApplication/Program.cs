@@ -43,10 +43,15 @@ namespace TestConsoleApplication
             #endregion
             */
 
-            Image.ImageTest.WaterMarkByText();
+            // 图片加水印
+            //Image.ImageTest.WaterMarkByText();
 
             //Cache.RedisTest.String();
             //Cache.RedisTest.Sort();
+
+            EncryptDemo.rsaEncrypt();
+            EncryptDemo.rsaDecrypt();
+            EncryptDemo.verifyEqual();
 
             Console.ReadKey();
         }

@@ -31,6 +31,10 @@
     <DocumentationFile>bin\Release\ClassLib4Net.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.9.0.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Enyim.Caching">
       <HintPath>OtherComponents\Enyim.Caching.dll</HintPath>
     </Reference>
@@ -141,6 +145,7 @@
     <Compile Include="Encrypt\DESHelper.cs" />
     <Compile Include="Encrypt\MD5Helper.cs" />
     <Compile Include="Encrypt\OtherHelper.cs" />
+    <Compile Include="Encrypt\RSAHelper.cs" />
     <Compile Include="Encrypt\SHA1Helper.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="ExcelHelper.cs" />

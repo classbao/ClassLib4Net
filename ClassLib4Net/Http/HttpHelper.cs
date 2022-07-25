@@ -413,15 +413,15 @@ namespace ClassLib4Net.Http
 			return fileName;
 		}
 
-		/// <summary>
-		/// 从网上下载文件，到本地，并进行保存
-		/// 熊学浩
-		/// 2015-01-25
-		/// </summary>
-		/// <param name="url">网络资源文件绝对URL</param>
-		/// <param name="savePath">保存位置绝对路径</param>
-		/// <returns>保存位置绝对路径</returns>
-		public static string HttpDownloadFile(string url, string savePath)
+        /// <summary>
+        /// 从网上下载文件，到本地，并进行保存
+        /// 熊学浩
+        /// 2015-01-25
+        /// </summary>
+        /// <param name="url">网络资源文件绝对URL https://www.aazao.com/files/article/image/93/93199/93199s.jpg </param>
+        /// <param name="savePath">保存位置绝对路径，需要包含文件名 @"c:\gif.png" </param>
+        /// <returns>保存位置绝对路径</returns>
+        public static string HttpDownloadFile(string url, string savePath)
 		{
 			string fileName = string.Empty, folderPath = string.Empty;
 			Match m_fileName = (new Regex(@"[^\\]+$", RegexOptions.IgnoreCase)).Match(savePath);

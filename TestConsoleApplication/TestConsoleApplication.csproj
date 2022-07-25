@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\RedisTest.cs" />
+    <Compile Include="EncryptDemo.cs" />
     <Compile Include="Image\ImageTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
