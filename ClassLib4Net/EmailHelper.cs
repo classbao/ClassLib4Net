@@ -15,20 +15,58 @@ namespace ClassLib4Net
     public class EmailHelper
     {
         static Regex mailRegex = new Regex(@"\A(?:(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|""(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*"")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))\Z");
-        
-		/// <summary>
-		/// 发送邮件的方法
+
+        /*
+        public static void email()
+        {
+            var emailAcount = "authservice@wenxuebank.com";  //企业邮箱
+            var emailPassword = "WenXueBank2023";  //用的授权码 不是邮箱登录密码 
+            var reciver = "1165458780@qq.com";
+            var content = "这个是邮件内容：测试测试测试，我是内容，我是内容";
+            MailMessage message = new MailMessage();
+            //设置发件人,发件人需要与设置的邮件发送服务器的邮箱一致
+            MailAddress fromAddr = new MailAddress("authservice@wenxuebank.com");
+            message.From = fromAddr;
+            message.BodyEncoding = Encoding.UTF8;
+
+            //设置收件人,可添加多个,添加方法与下面的一样
+            message.To.Add(reciver);//设置邮件标题
+            message.Subject = "这个是邮箱标题";
+            //设置邮件内容
+            message.Body = content;
+            //设置邮件发送服务器,服务器根据你使用的邮箱而不同,可以到相应的 邮箱管理后台查看
+            SmtpClient client = new SmtpClient("smtphz.qiye.163.com", 25);//这个是企业的   个人 smtp.163.com  25 
+            client.UseDefaultCredentials = true;
+            //设置发送人的邮箱账号和密码
+            client.Credentials = new NetworkCredential(emailAcount, emailPassword);//启用ssl,也就是安全发送
+            client.EnableSsl = true;
+            //发送邮件
+            client.Send(message);//发送
+
+        }
+        */
+
+        /*
+            var tolist = new System.Collections.Generic.List<string>() { "1165458780@qq.com" };
+            ClassLib4Net.EmailHelper.Send("authservice@wenxuebank.com", tolist.ToArray(), "【文学资料认证】xxx", "内容： <h3> 文学资料认证</h3> <a href=\"http://wenxuebank.com/book/info/bca062916d4045cf8032b2816a538d7e\">篮坛：从神经刀开始</a> ", "文学资料认证", "smtphz.qiye.163.com", 25, "authservice@wenxuebank.com", "WenXueBank2023", false, null, null);
+         */
+
+        /// <summary>
+        /// 发送邮件的方法
         /// </summary>
-		/// <param name="from">发件箱地址</param>
+        /// <param name="from">发件箱地址</param>
+        /// <param name="tolist">收件箱地址集合</param>
         /// <param name="title">标题</param>
         /// <param name="body">内容</param>
         /// <param name="displayName">发件人显示名</param>
-		/// <param name="smtp">smtp服务器地址</param>
-		/// <param name="smtpUsername">发件箱地址</param>
+        /// <param name="smtp">smtp服务器地址</param>
+        /// <param name="smtpport">smtp服务器端口（一般是25）</param>
+        /// <param name="smtpUsername">发件箱地址</param>
         /// <param name="smtpPassword">发件箱密码</param>
         /// <param name="isAysnc">异步</param>
-        /// <param name="tos">密件抄送多人</param>
-		public static void Send(string from, string title, string body, string displayName, string smtp = "mail.itv.cn", string smtpUsername = "lichun@itv.cn", string smtpPassword = "!QAZ2wsx", bool isAysnc = false, params string[] tos)
+        /// <param name="tobcclist">抄送多人</param>
+        /// <param name="tobcclist">密件抄送多人</param>
+        public static void Send(string from, string[] tolist, string title, string body, string displayName, string smtp = "mail.itv.cn", int smtpport = 25, string smtpUsername = "lichun@itv.cn", string smtpPassword = "!QAZ2wsx", bool isAysnc = false, string[] tocclist = null, string[] tobcclist = null)
         {
             MailAddress sender = new MailAddress(from, displayName, Encoding.UTF8);
 
@@ -42,19 +80,40 @@ namespace ClassLib4Net
                 IsBodyHtml = true
             };
 
-            foreach (string bcc in tos)
+            foreach(string to in tolist)
             {
-                if (mailRegex.IsMatch(bcc))
+                if(mailRegex.IsMatch(to))
                 {
-                    message.Bcc.Add(bcc);
+                    message.To.Add(to);
                 }
             }
 
-            SmtpClient client = new SmtpClient(smtp);
+            if(null != tocclist && tocclist.Count() > 0)
+            {
+                foreach(string cc in tocclist)
+                {
+                    if(mailRegex.IsMatch(cc))
+                    {
+                        message.CC.Add(cc);
+                    }
+                }
+            }
+            if(null != tobcclist && tobcclist.Count() > 0)
+            {
+                foreach(string bcc in tobcclist)
+                {
+                    if(mailRegex.IsMatch(bcc))
+                    {
+                        message.Bcc.Add(bcc);
+                    }
+                }
+            }
+
+            SmtpClient client = new SmtpClient(smtp, smtpport);
 
             client.Credentials = new System.Net.NetworkCredential(smtpUsername, smtpPassword);
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            if (isAysnc) client.SendAsync(message, null);
+            if(isAysnc) client.SendAsync(message, null);
             else client.Send(message);
         }
 

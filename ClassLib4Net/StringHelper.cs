@@ -1198,6 +1198,148 @@ namespace ClassLib4Net
                 return false;
         }
 
+        #region 大写数字字符串转换为阿拉伯数字
+
+        /// <summary>
+        /// 单个数字转换。示例：〇一二三四五六七八九十，〇三，零三
+        /// </summary>
+        /// <param name="SingleUppercaseDigit"></param>
+        /// <returns></returns>
+        public static int GetDigitFormUppercaseBase(string SingleUppercaseDigit)
+        {
+            switch(SingleUppercaseDigit)
+            {
+                case "一": return 1;
+                case "二": return 2;
+                case "三": return 3;
+                case "四": return 4;
+                case "五": return 5;
+                case "六": return 6;
+                case "七": return 7;
+                case "八": return 8;
+                case "九": return 9;
+                case "十": return 10;
+                default:
+                case "零":
+                case "〇": return 0;
+            }
+        }
+
+        /// <summary>
+        /// 单级别的数字转换（小于万级别）。示例“三千一百八十二”，“一百八十二”，“八十二”，“八十”，“〇二”，“零二”，“二”
+        /// </summary>
+        /// <param name="SingleUppercaseDigit2"></param>
+        /// <returns></returns>
+        public static int GetDigitFormUppercaseBase2(string SingleUppercaseDigit2)
+        {
+            if(!string.IsNullOrWhiteSpace(SingleUppercaseDigit2))
+            {
+                int num = 0;
+                SingleUppercaseDigit2 = Regex.Replace(SingleUppercaseDigit2, @"^[〇零]+", "");
+                var arr = SingleUppercaseDigit2.ToCharArray();
+                if(null != arr && arr.Length > 0)
+                {
+                    if(arr.Length > 1 && "千" == arr[1].ToString())
+                    {
+                        num += GetDigitFormUppercaseBase(arr[0].ToString()) * 1000;
+                        num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
+                    }
+                    else if(arr.Length > 1 && "百" == arr[1].ToString())
+                    {
+                        num += GetDigitFormUppercaseBase(arr[0].ToString()) * 100;
+                        num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
+                    }
+                    else if("十" == arr[0].ToString())
+                    {
+                        // 十，十三
+                        num += GetDigitFormUppercaseBase(arr[0].ToString());
+                        if(arr.Length > 1)
+                        {
+                            num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(1, SingleUppercaseDigit2.Length - 1));
+                        }
+                    }
+                    else if(arr.Length > 1 && "十" == arr[1].ToString())
+                    {
+                        // 三十，三十八
+                        num += GetDigitFormUppercaseBase(arr[0].ToString()) * 10;
+                        num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
+                    }
+                    else if(arr.Length > 1 && ("〇" == arr[0].ToString() || "零" == arr[0].ToString()))
+                    {
+                        num += GetDigitFormUppercaseBase(arr[1].ToString());
+                        num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
+                    }
+                    else
+                    {
+                        if(arr.Length == 1)
+                        {
+                            num += GetDigitFormUppercaseBase(arr[0].ToString());
+                        }
+                        else
+                        {
+                            // 第一二六一章　献计
+                            StringBuilder sb = new StringBuilder();
+                            foreach(var i in arr)
+                            {
+                                sb.Append(GetDigitFormUppercaseBase(i.ToString()));
+                            }
+                            num += ConvertHelper.GetInteger(sb.ToString());
+                        }
+                    }
+
+                }
+                return num;
+            }
+            return 0;
+        }
+
+
+        /// <summary>
+        /// 示例：第五千九百三十四亿五千九百三十四万三千一百八十二章 返回：593459343182
+        /// </summary>
+        /// <param name="UppercaseDigit"></param>
+        /// <returns></returns>
+        public static long GetDigitFormUppercase(string UppercaseDigit)
+        {
+            if(!string.IsNullOrWhiteSpace(UppercaseDigit))
+            {
+                // 第五千九百三十四亿五千九百三十四万三千一百八十二章
+                var m = Regex.Match(UppercaseDigit, @"[一二三四五六七八九十]{1}[〇零一二三四五六七八九十百千万亿]*");
+                if(null != m && !string.IsNullOrWhiteSpace(m.Value))
+                {
+                    // 五千九百三十四亿五千九百三十四万三千一百八十二
+                    long num = 0;
+                    var Yi = Regex.Match(m.Value, @"^[〇零一二三四五六七八九十百千万]+亿");
+                    var Wan = Regex.Match(m.Value, @"^[〇零一二三四五六七八九十百千]+万");
+                    if(null != Yi & !string.IsNullOrWhiteSpace(Yi.Value))
+                    {
+                        string Yi_s = Yi.ToString().Replace("亿", ""); // 五千九百三十四亿
+                        num += GetDigitFormUppercaseBase2(Yi_s) * (long)100000000;
+                        num += GetDigitFormUppercase(m.Value.Replace(Yi.ToString(), ""));
+                    }
+                    else if(null != Wan & !string.IsNullOrWhiteSpace(Wan.Value))
+                    {
+                        string Wan_s = Wan.ToString().Replace("万", ""); // 五千九百三十四亿
+                        num += GetDigitFormUppercaseBase2(Wan_s) * (long)10000;
+                        num += GetDigitFormUppercase(m.Value.Replace(Wan.ToString(), ""));
+                    }
+                    else
+                    {
+                        num += GetDigitFormUppercaseBase2(m.Value);
+                    }
+
+                    return num;
+                }
+            }
+
+            return 0;
+        }
+
+
+        #endregion
+
+
+
         #endregion
 
     }
