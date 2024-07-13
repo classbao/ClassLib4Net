@@ -1209,19 +1209,40 @@ namespace ClassLib4Net
         {
             switch(SingleUppercaseDigit)
             {
-                case "一": return 1;
-                case "二": return 2;
-                case "三": return 3;
-                case "四": return 4;
-                case "五": return 5;
-                case "六": return 6;
-                case "七": return 7;
-                case "八": return 8;
-                case "九": return 9;
-                case "十": return 10;
+                case "一":
+                case "壹":
+                    return 1;
+                case "二":
+                case "贰":
+                    return 2;
+                case "三":
+                case "叁":
+                    return 3;
+                case "四":
+                case "肆":
+                    return 4;
+                case "五":
+                case "伍":
+                    return 5;
+                case "六":
+                case "陆":
+                    return 6;
+                case "七":
+                case "柒":
+                    return 7;
+                case "八":
+                case "捌":
+                    return 8;
+                case "九":
+                case "玖":
+                    return 9;
+                case "十":
+                case "拾":
+                    return 10;
                 default:
                 case "零":
-                case "〇": return 0;
+                case "〇":
+                    return 0;
             }
         }
 
@@ -1239,17 +1260,17 @@ namespace ClassLib4Net
                 var arr = SingleUppercaseDigit2.ToCharArray();
                 if(null != arr && arr.Length > 0)
                 {
-                    if(arr.Length > 1 && "千" == arr[1].ToString())
+                    if(arr.Length > 1 && ("千" == arr[1].ToString() || "仟" == arr[1].ToString()))
                     {
                         num += GetDigitFormUppercaseBase(arr[0].ToString()) * 1000;
                         num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
                     }
-                    else if(arr.Length > 1 && "百" == arr[1].ToString())
+                    else if(arr.Length > 1 && ("百" == arr[1].ToString() || "佰" == arr[1].ToString()))
                     {
                         num += GetDigitFormUppercaseBase(arr[0].ToString()) * 100;
                         num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(2, SingleUppercaseDigit2.Length - 2));
                     }
-                    else if("十" == arr[0].ToString())
+                    else if("十" == arr[0].ToString() || "拾" == arr[0].ToString())
                     {
                         // 十，十三
                         num += GetDigitFormUppercaseBase(arr[0].ToString());
@@ -1258,7 +1279,7 @@ namespace ClassLib4Net
                             num += GetDigitFormUppercaseBase2(SingleUppercaseDigit2.Substring(1, SingleUppercaseDigit2.Length - 1));
                         }
                     }
-                    else if(arr.Length > 1 && "十" == arr[1].ToString())
+                    else if(arr.Length > 1 && ("十" == arr[1].ToString() || "拾" == arr[1].ToString()))
                     {
                         // 三十，三十八
                         num += GetDigitFormUppercaseBase(arr[0].ToString()) * 10;
@@ -1304,13 +1325,13 @@ namespace ClassLib4Net
             if(!string.IsNullOrWhiteSpace(UppercaseDigit))
             {
                 // 第五千九百三十四亿五千九百三十四万三千一百八十二章
-                var m = Regex.Match(UppercaseDigit, @"[一二三四五六七八九十]{1}[〇零一二三四五六七八九十百千万亿]*");
+                var m = Regex.Match(UppercaseDigit, @"[一二三四五六七八九十壹贰叁肆伍陆柒捌玖拾]{1}[〇一二三四五六七八九十百千万亿零壹贰叁肆伍陆柒捌玖拾佰仟萬]*");
                 if(null != m && !string.IsNullOrWhiteSpace(m.Value))
                 {
                     // 五千九百三十四亿五千九百三十四万三千一百八十二
                     long num = 0;
-                    var Yi = Regex.Match(m.Value, @"^[〇零一二三四五六七八九十百千万]+亿");
-                    var Wan = Regex.Match(m.Value, @"^[〇零一二三四五六七八九十百千]+万");
+                    var Yi = Regex.Match(m.Value, @"^[〇一二三四五六七八九十百千万零壹贰叁肆伍陆柒捌玖拾佰仟萬]+亿");
+                    var Wan = Regex.Match(m.Value, @"^[〇一二三四五六七八九十百千零壹贰叁肆伍陆柒捌玖拾佰仟]+[万萬]");
                     if(null != Yi & !string.IsNullOrWhiteSpace(Yi.Value))
                     {
                         string Yi_s = Yi.ToString().Replace("亿", ""); // 五千九百三十四亿
@@ -1319,7 +1340,7 @@ namespace ClassLib4Net
                     }
                     else if(null != Wan & !string.IsNullOrWhiteSpace(Wan.Value))
                     {
-                        string Wan_s = Wan.ToString().Replace("万", ""); // 五千九百三十四亿
+                        string Wan_s = Wan.ToString().Replace("万", "").Replace("萬", ""); // 五千九百三十四亿
                         num += GetDigitFormUppercaseBase2(Wan_s) * (long)10000;
                         num += GetDigitFormUppercase(m.Value.Replace(Wan.ToString(), ""));
                     }
