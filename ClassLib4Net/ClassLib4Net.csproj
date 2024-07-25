@@ -104,6 +104,7 @@
     <Compile Include="Api\ApiStatus.cs" />
     <Compile Include="AsyncHelper.cs" />
     <Compile Include="BarCodeHelper.cs" />
+    <Compile Include="BookHelper.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheManager.cs" />
     <Compile Include="Cache\CacheManagerConfig.cs" />
