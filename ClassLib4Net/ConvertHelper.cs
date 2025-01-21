@@ -448,152 +448,215 @@ namespace ClassLib4Net
         }
         #endregion
 
-        #region 时间戳
-        /// <summary>
-        /// Unix时间戳转换为标准时间格式（基准时间为"1970-1-1 08:00:00"）
-        /// </summary>
-        /// <param name="TimeStamp">时间戳（10位）</param>
-        /// <returns>标准时间格式</returns>
-        public static DateTime TimeStamp(int timestamp)
-        {
-            TimeSpan ts = new TimeSpan(0, 0, 0, timestamp);
-            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
-            DateTime now = baseTime + ts;
 
-            return now;
+        #region 时间戳（方式一）UnixEpoch ToUniversalTime
+
+        /// <summary>
+        /// 时间戳原点 / Unix纪元（协调世界时 (UTC)的 1970-1-1 0:0:0 +00 ）
+        /// </summary>
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        /// <summary>
+        /// 任意时区的日期时间转换为UTC时间后与时间戳原点的时长（用于计算时间戳）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns>时间距离</returns>
+        public static TimeSpan UnixElapsedTime(DateTime dateTime)
+        {
+            DateTime utcTime = dateTime.ToUniversalTime();
+            TimeSpan elapsedTime = utcTime - UnixEpoch;
+            return elapsedTime;
         }
         /// <summary>
-        /// 标准时间格式转换为Unix时间戳，秒/10位（基准时间为"1970-1-1 08:00:00"）
+        /// 将任意时区的日期时间转换为Unix时间戳（秒）
         /// </summary>
-        /// <param name="time">标准时间格式</param>
-        /// <returns>时间戳</returns>
-        public static int TimeStamp(DateTime time)
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static double ToUnixTimeSeconds(DateTime dateTime)
         {
-            //基准为"1970-1-1 08:00:00"时间转整数
-            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
-            TimeSpan ts = time - baseTime;
-            int TimeStamp = (int)ts.TotalSeconds;
-
-            return TimeStamp;
+            return UnixElapsedTime(dateTime).TotalSeconds;
+        }
+        /// <summary>
+        /// 将任意时区的日期时间转换为Unix时间戳（秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static long ToTimestampSeconds(DateTime dateTime)
+        {
+            return (long)UnixElapsedTime(dateTime).TotalSeconds;
         }
 
         /// <summary>
-        /// 将Unix时间戳转换为DateTime类型时间，精确到毫秒/13位（基准时间为"1970-1-1 00:00:00"转换成当前计算机的时区的时间）
+        /// 将任意时区的日期时间转换为Unix时间戳（毫秒）
         /// </summary>
-        /// <param name="timestamp">double 型数字（13位）</param>
-        /// <returns>DateTime</returns>
-        public static System.DateTime TimeStampToLocalTime(double timestamp)
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static double ToUnixTimeMilliseconds(DateTime dateTime)
         {
-            System.DateTime time = System.DateTime.MinValue;
-            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1, 0, 0, 0));
-            time = startTime.AddMilliseconds(timestamp);
+            return UnixElapsedTime(dateTime).TotalMilliseconds;
+        }
+        /// <summary>
+        /// 将任意时区的日期时间转换为Unix时间戳（毫秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static long ToTimestampMilliseconds(DateTime dateTime)
+        {
+            return (long)UnixElapsedTime(dateTime).TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// Unix时间戳（秒）转换为当地时间（System.DateTimeKind.Local）
+        /// </summary>
+        /// <param name="unixTimeSeconds"></param>
+        /// <returns></returns>
+        public static DateTime FromUnixTimeSeconds(double unixTimeSeconds)
+        {
+            var utcTime = UnixEpoch.AddSeconds(unixTimeSeconds);
+            return utcTime.ToLocalTime();
+        }
+        /// <summary>
+        /// Unix时间戳（秒）转换为当地时间（System.DateTimeKind.Local）
+        /// </summary>
+        /// <param name="unixTimeSeconds"></param>
+        /// <returns></returns>
+        public static DateTime FromUnixTimeSeconds(long unixTimeSeconds)
+        {
+            var utcTime = UnixEpoch.AddSeconds(unixTimeSeconds);
+            return utcTime.ToLocalTime();
+        }
+        /// <summary>
+        /// Unix时间戳（毫秒）转换为当地时间（System.DateTimeKind.Local）
+        /// </summary>
+        /// <param name="unixTimeMilliseconds"></param>
+        /// <returns></returns>
+        public static DateTime FromUnixTimeMilliseconds(double unixTimeMilliseconds)
+        {
+            var utcTime = UnixEpoch.AddMilliseconds(unixTimeMilliseconds);
+            return utcTime.ToLocalTime();
+        }
+        /// <summary>
+        /// Unix时间戳（毫秒）转换为当地时间（System.DateTimeKind.Local）
+        /// </summary>
+        /// <param name="unixTimeMilliseconds"></param>
+        /// <returns></returns>
+        public static DateTime FromUnixTimeMilliseconds(long unixTimeMilliseconds)
+        {
+            var utcTime = UnixEpoch.AddMilliseconds(unixTimeMilliseconds);
+            return utcTime.ToLocalTime();
+        }
+        
+        #endregion
+
+        #region 时间戳（方式二） TimeZone.CurrentTimeZone.ToLocalTime
+
+        /// <summary>
+        /// 当前时区的日期时间与unix时间戳原点的时长（用于计算时间戳）
+        /// DateTime时间格式转换为Unix时间戳格式（基准时间为"1970-1-1 00:00:00"转换成当前计算机的时区的时间）
+        /// </summary>
+        /// <param name="time">DateTime时间</param>
+        /// <returns>时间距离</returns>
+        public static TimeSpan LocalTimeElapsedTime(DateTime dateTime)
+        {
+            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0, 0));
+            TimeSpan elapsedTime = dateTime - startTime;
+            return elapsedTime;
+        }
+
+        /// <summary>
+        /// 当前时区的日期时间转换为Unix时间戳（秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns>Unix时间戳（秒）</returns>
+        public static double ToTimeStampSecondsFromLocalTime(DateTime dateTime)
+        {
+            return LocalTimeElapsedTime(dateTime).TotalSeconds;
+        }
+        /// <summary>
+        /// 当前时区的日期时间转换为Unix时间戳（秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns>Unix时间戳（秒）</returns>
+        public static long ToTimestampSecondsFromLocalTime(DateTime dateTime)
+        {
+            return (long)LocalTimeElapsedTime(dateTime).TotalSeconds;
+        }
+        /// <summary>
+        /// 当前时区的日期时间转换为Unix时间戳（毫秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns>Unix时间戳（毫秒）</returns>
+        public static double ToTimeStampMillisecondsFromLocalTime(DateTime dateTime)
+        {
+            return LocalTimeElapsedTime(dateTime).TotalMilliseconds;
+        }
+        /// <summary>
+        /// 当前时区的日期时间转换为Unix时间戳（毫秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns>Unix时间戳（毫秒）</returns>
+        public static long ToTimestampMillisecondsFromLocalTime(DateTime dateTime)
+        {
+            return (long)LocalTimeElapsedTime(dateTime).TotalMilliseconds;
+        }
+
+
+        /// <summary>
+        /// Unix时间戳（秒）转换为当地时间（System.DateTimeKind.Local）
+        /// </summary>
+        /// <param name="timestampSeconds"></param>
+        /// <returns></returns>
+        public static DateTime FromTimeStampSecondsToLocalTime(double timestampSeconds)
+        {
+            DateTime time = DateTime.MinValue;
+            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0));
+            time = startTime.AddSeconds(timestampSeconds);
             return time;
         }
 
         /// <summary>
-        /// DateTime时间格式转换为Unix时间戳格式，精确到毫秒/13位（基准时间为"1970-1-1 00:00:00"转换成当前计算机的时区的时间）
+        /// Unix时间戳（毫秒）转换为当地时间（System.DateTimeKind.Local）
         /// </summary>
-        /// <param name="time">DateTime时间</param>
-        /// <returns>时间戳</returns>
-        public static long TimeStampToLocalTime(System.DateTime time)
+        /// <param name="timestamp">double 型数字（13位）</param>
+        /// <returns>DateTime</returns>
+        public static DateTime FromTimeStampMillisecondsToLocalTime(double timestampMilliseconds)
         {
-            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1, 0, 0, 0, 0));
-            long t = (time.Ticks - startTime.Ticks) / 10000;            //除10000调整为13位
-            return t;
-        }
-
-        /// <summary>
-        /// 日期转换成unix时间戳，精确到秒/10位（基准时间为"1970-1-1 00:00:00.000"，并通过target.Kind来控制基于本地时间、协调世界时间UTC，还是两者皆否）
-        /// </summary>
-        /// <param name="dateTime">时间对象</param>
-        /// <returns></returns>
-        public static long TimeStampByKind(DateTime time)
-        {
-            var start = new DateTime(1970, 1, 1, 0, 0, 0, time.Kind);
-            return Convert.ToInt64((time - start).TotalSeconds);
-        }
-
-        /// <summary>
-        /// unix时间戳转换成日期（基准时间为"1970-1-1 00:00:00.000"，并通过target.Kind来控制基于本地时间、协调世界时间UTC，还是两者皆否）
-        /// </summary>
-        /// <param name="target">参考DateTime对象（通过target.Kind来控制基于本地时间、协调世界时间UTC，还是两者皆否）</param>
-        /// <param name="timestamp">时间戳（秒/10位）</param>
-        /// <returns></returns>
-        public static DateTime TimeStampByKind(DateTime target, long timestamp)
-        {
-            var start = new DateTime(1970, 1, 1, 0, 0, 0, target.Kind);
-            return start.AddSeconds(timestamp);
+            DateTime time = DateTime.MinValue;
+            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0));
+            time = startTime.AddMilliseconds(timestampMilliseconds);
+            return time;
         }
 
         #endregion
 
-        #region C#本地时间和GMT(UTC)时间的转换
-        /// <summary>  
-        /// 本地时间转成GMT时间。
-        /// string s = ToGMTString(DateTime.Now); 
-        /// 本地时间为：2016-6-30 10:04:39 
-        /// 转换后的时间为：Thu, 30 Jun 2016 2:04:39 GMT
+        #region 时间戳（方式三） 极简版
+
+        /// <summary>
+        /// Unix时间戳（秒）转换为标准时间格式（基准时间为"1970-1-1 08:00:00"北京时间）
         /// </summary>
-        /// <param name="dateTime">DateTime</param>
-        /// <returns></returns>
-        public static string GMTString(DateTime dateTime)
+        /// <param name="TimeStamp">Unix时间戳（10位）</param>
+        /// <returns>标准时间格式</returns>
+        public static DateTime TimeStamp(long timestamp)
         {
-            return dateTime.ToUniversalTime().ToString("r");
+            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
+            return baseTime.AddSeconds(timestamp);
+        }
+        /// <summary>
+        /// 标准时间格式转换为Unix时间戳（秒）（基准时间为"1970-1-1 08:00:00"北京时间）
+        /// </summary>
+        /// <param name="time">标准时间格式</param>
+        /// <returns>Unix时间戳</returns>
+        public static long TimeStamp(DateTime time)
+        {
+            //基准为"1970-1-1 08:00:00"时间转整数
+            DateTime baseTime = Convert.ToDateTime("1970-1-1 08:00:00");
+            TimeSpan ts = time - baseTime;
+            long TimeStamp = (long)ts.TotalSeconds;
+
+            return TimeStamp;
         }
 
-        /// <summary>  
-        /// 本地时间转成GMT格式的时间。
-        /// string s = ToGMTFormat(DateTime.Now); 
-        /// 本地时间为：2016-6-30 10:04:39 
-        /// 转换后的时间为：Thu, 30 Jun 2016 10:04:39 GMT+0800
-        /// </summary>  
-        /// <param name="dateTime">DateTime</param>
-        /// <returns></returns>
-        public static string GMTByTimezone(DateTime dateTime)
-        {
-            return dateTime.ToString("r") + dateTime.ToString("zzz").Replace(":", "");
-        }
-
-        /// <summary>  
-        /// GMT时间转成本地时间。
-        /// DateTime dt1 = GMT2Local("Thu, 30 Jun 2016 02:04:39 GMT"); 
-        /// 转换后的dt1为：2016-6-30 10:04:39 
-        /// DateTime dt2 = GMT2Local("Thu, 30 Jun 2016 10:04:39 GMT+0800");
-        /// 转换后的dt2为：2016-6-30 10:04:39
-        /// </summary>  
-        /// <param name="gmt">字符串形式的GMT时间</param>  
-        /// <returns></returns>  
-        public static DateTime GMT2Local(string gmt)
-        {
-            DateTime dt = DateTime.MinValue;
-            try
-            {
-                string pattern = "";
-                if(gmt.IndexOf("+0") != -1)
-                {
-                    gmt = gmt.Replace("GMT", "");
-                    pattern = "ddd, dd MMM yyyy HH':'mm':'ss zzz";
-                }
-                if(gmt.ToUpper().IndexOf("GMT") != -1)
-                {
-                    pattern = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
-                }
-                if(pattern != "")
-                {
-                    dt = DateTime.ParseExact(gmt, pattern, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal);
-                    dt = dt.ToLocalTime();
-                }
-                else
-                {
-                    dt = Convert.ToDateTime(gmt);
-                }
-            }
-            catch
-            {
-            }
-            return dt;
-        }
         #endregion
+
 
     }
 }

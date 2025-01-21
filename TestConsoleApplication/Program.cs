@@ -10,24 +10,10 @@ namespace TestConsoleApplication
     {
         static void Main(string[] args)
         {
+            ConvertHelperTest.timestamp();
             /*
-            #region 时间戳测试
-            var t = new DateTime(2018, 11, 6, 11, 17, 9, 964);
-            Console.WriteLine("目标时间：{0}", t.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-            var t1 = ClassLib4Net.ConvertHelper.TimeStamp(1541474229); //2018-11-06 11:17:09
-            var t2 = ClassLib4Net.ConvertHelper.TimeStampByKind(t);
-            Console.WriteLine("目标时间：{0}，时间戳：{1}", t1.ToString("yyyy-MM-dd HH:mm:ss.fff"), t2);
-
-            var t3 = ClassLib4Net.ConvertHelper.TimeStampToLocalTime(1541474229964); //2018-11-06 11:17:09.964
-            var t4 = ClassLib4Net.ConvertHelper.TimeStampToLocalTime(t);
-            Console.WriteLine("目标时间：{0}，时间戳：{1}", t3.ToString("yyyy-MM-dd HH:mm:ss.fff"), t4);
-
-            string gmt = ClassLib4Net.ConvertHelper.GMTString(t);
-            Console.WriteLine("本地时间：" + t.ToString("yyyy-MM-dd HH:mm:ss.fff") + "     GMTString转换后的时间：" + gmt);
-            string gmtZ = ClassLib4Net.ConvertHelper.GMTByTimezone(t);
-            Console.WriteLine("本地时间：" + t.ToString("yyyy-MM-dd HH:mm:ss.fff") + "     GMTByTimezone转换后的时间：" + gmtZ);
-            Console.WriteLine("     GMTByTimezone的时间：" + gmtZ + "本地时间：" + ClassLib4Net.ConvertHelper.GMT2Local(gmtZ).ToString("yyyy-MM-dd HH:mm:ss.fff"));
-
+            #region 密码加、解密
+            
             const string s = "123456";
             Console.WriteLine("密码：" + s);
             string md5 = ClassLib4Net.Encrypt.MD5Helper.MD5Encrypt(s);
@@ -49,9 +35,9 @@ namespace TestConsoleApplication
             //Cache.RedisTest.String();
             //Cache.RedisTest.Sort();
 
-            EncryptDemo.rsaEncrypt();
-            EncryptDemo.rsaDecrypt();
-            EncryptDemo.verifyEqual();
+            //EncryptDemo.rsaEncrypt();
+            //EncryptDemo.rsaDecrypt();
+            //EncryptDemo.verifyEqual();
 
             Console.ReadKey();
         }
